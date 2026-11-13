@@ -15,11 +15,36 @@ def clean_sellers(sellers):
 
     return sellers
 
-def convert_date_columns(df,columns):
+def convert_date_columns(df, columns):
     df = df.copy()
+
     for column in columns:
         if column in df.columns:
-            df[column] = pd.to_datetime(df[column], errors = 'coerce')
+            original = df[column]
+
+            normalized = original.astype("string").str.replace(
+                r"^(\d{4}-\d{2}-\d{2})(\d{2}:\d{2}:\d{2})$",
+                r"\1 \2",
+                regex=True
+            )
+
+            converted = pd.to_datetime(
+                normalized,
+                format="mixed",
+                errors="coerce"
+            )
+
+            invalid = original.notna() & converted.isna()
+
+            if invalid.any():
+                examples = original[invalid].head(5).tolist()
+                raise ValueError(
+                    f"Found {invalid.sum()} invalid dates in "
+                    f"{column}: {examples}"
+                )
+
+            df[column] = converted
+
     return df
 
 def convert_numeric_columns(df,columns):
@@ -49,7 +74,6 @@ def clean_customers(customers):
 
 def clean_order_items(order_items):
     order_items = clean_column_names(order_items)
-    print("Order items columns:", order_items.columns.tolist())
     numeric_columns = [
         "order_item_id",
         "price",
@@ -113,15 +137,12 @@ def clean_reviews(reviews):
         errors="coerce"
     ).astype("Int64")
 
-    reviews["review_creation_date"] = pd.to_datetime(
-        reviews["review_creation_date"],
-        errors="coerce"
-    )
+    date_columns = [
+        "review_creation_date",
+        "review_answer_timestamp",
+    ]
 
-    reviews["review_answer_timestamp"] = pd.to_datetime(
-        reviews["review_answer_timestamp"],
-        errors="coerce"
-    )
+    reviews = convert_date_columns(reviews, date_columns)
 
     return reviews
 

@@ -111,6 +111,11 @@ CREATE TABLE reviews (
         REFERENCES orders(order_id)
 );
 
+CREATE TABLE IF NOT EXISTS category_translation (
+    product_category_name VARCHAR(100) PRIMARY KEY,
+    product_category_name_english VARCHAR(100)
+);
+
 -- ============================================
 -- INDEXES FOR COMMON JOINS
 -- ============================================
