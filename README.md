@@ -532,7 +532,7 @@ Through this project, I gained practical experience with:
 
 Data Science Student | Aspiring AI Engineer & Data Engineer
 
-GitHub: [github.com/YOUR_USERNAME](https://github.com/YOUR_USERNAME)
+GitHub: [github.com/anouarSm](https://github.com/anouarSm)
 
 ---
 
